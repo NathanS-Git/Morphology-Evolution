@@ -2,7 +2,6 @@ import numpy as np
 import mujoco_py
 import torch
 import time
-import gym
 import os
 import glob
 import re
@@ -10,32 +9,13 @@ import re
 import TD3
 import utils
 
+import environment
 from MorphologyGeneration import MorphologyGeneration as morphgen
-
-# Simulation defaults
-CTRL_COST_WEIGHT =          0.05
-CONTACT_COST_WEIGHT =       5e-4
-HEALTHY_REWARD =            0
-TERMINATE_WHEN_UNHEALTHY =  True
-HEALTHY_Z_RANGE =           (0, 2)
-CONTACT_FORCE_RANGE =       (-1, 1)
-RESET_NOISE_SCALE =         0.1
-EXCLUDE_CURRENT_POSITIONS_FROM_OBSERVATION = True
 
 
 def eval_policy(policy, seed, morphology_file, eval_episodes=10):
-    pwd = os.getcwd()
 
-    eval_env = gym.make("Ant-v3",xml_file=f"{pwd}/{morphology_file}",
-        ctrl_cost_weight=CTRL_COST_WEIGHT,
-        contact_cost_weight=CONTACT_COST_WEIGHT,
-        healthy_reward=HEALTHY_REWARD,
-        terminate_when_unhealthy=TERMINATE_WHEN_UNHEALTHY,
-        healthy_z_range=HEALTHY_Z_RANGE,
-        contact_force_range=CONTACT_FORCE_RANGE,
-        reset_noise_scale=RESET_NOISE_SCALE,
-        exclude_current_positions_from_observation=EXCLUDE_CURRENT_POSITIONS_FROM_OBSERVATION
-    )
+    eval_env = environment.make(morphology_file)
     eval_env.seed(seed + 100)
 
     avg_reward = 0.
@@ -64,24 +44,18 @@ def eval_morphology(morphology_file,episode_count=1e7):
     print(f"Policy: TD3, Env: {morphology_name}, Seed: 0")
     print("---------------------------------------")
 
-    if not os.path.exists("./results/{gen}"):
+    if not os.path.exists("./results"):
         os.makedirs("./results")
 
     if not os.path.exists("./models"):
         os.makedirs("./models")
 
-    pwd = os.getcwd()
-
-    env = gym.make("Ant-v3",xml_file=f"{pwd}/{morphology_file}",
-        ctrl_cost_weight=CTRL_COST_WEIGHT,
-        contact_cost_weight=CONTACT_COST_WEIGHT,
-        healthy_reward=HEALTHY_REWARD,
-        terminate_when_unhealthy=TERMINATE_WHEN_UNHEALTHY,
-        healthy_z_range=HEALTHY_Z_RANGE,
-        contact_force_range=CONTACT_FORCE_RANGE,
-        reset_noise_scale=RESET_NOISE_SCALE,
-        exclude_current_positions_from_observation=EXCLUDE_CURRENT_POSITIONS_FROM_OBSERVATION
-    )
+    try:
+        env = environment.make(file_name)
+    except AttributeError:
+        print("{} CONTAINS NO LEGS".format(file_name))
+        # Give it negative infinity fitness
+        return float('-inf')
 
     # Set seeds
     env.seed(0)
@@ -120,7 +94,7 @@ def eval_morphology(morphology_file,episode_count=1e7):
 
     replay_buffer = utils.ReplayBuffer(state_dim, action_dim)
 
-    starting_episode = len(evaluations-1)*5e3
+    starting_episode = (len(evaluations)-1)*5000
 
     state, done = env.reset(), False
     episode_reward = 0
@@ -176,6 +150,6 @@ if (__name__ == "__main__"):
     xml_files.sort()
 
     file_name = xml_files[-1] # By default, use the latest morphology
-    file_name = "./morphology/Ant_Mod_0.xml"
+    file_name = "./morphology/Morphology_2022-Mar-26 21:24:21 Gen:0 9.xml"
 
     eval_morphology(file_name)

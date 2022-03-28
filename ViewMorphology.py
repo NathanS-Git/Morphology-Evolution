@@ -2,13 +2,13 @@ import numpy as np
 import mujoco_py
 import torch
 import time
-import gym
 import os
 import glob
 import re
 
 import TD3
 import utils
+import environment
 
 from MorphologyGeneration import MorphologyGeneration as morphgen
 
@@ -23,16 +23,7 @@ def view(morphology_file):
     pwd = os.getcwd()
     
     # Make sure these values are the same as evaluation
-    env = gym.make("Ant-v3",xml_file=f"{pwd}/morphology/{morphology_name}.xml",
-        ctrl_cost_weight = 0.05,
-        contact_cost_weight = 5e-4,
-        healthy_reward = 0,
-        terminate_when_unhealthy=True,
-        healthy_z_range=(0, 2),
-        contact_force_range=(-1, 1),
-        reset_noise_scale=0.1,
-        exclude_current_positions_from_observation=True
-    )
+    env = environment.make(file_name)
 
     # Set seeds
     env.seed(0)
@@ -65,8 +56,8 @@ def view(morphology_file):
         print("Failed to load pre-trained model. Defaulting to random values")
         policy_loaded = False
 
-    episodes = 1000
-    
+    episodes = 10000000
+
     if policy_loaded:
         avg_reward = 0.
         for _ in range(episodes):
