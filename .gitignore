@@ -1,5 +1,13 @@
+__pycache__/
 models/
 morphology/
 TD3/
 Temp/
 results/
+Paper/
+Poster/
+Backup*.dat*
+MUJOCO_LOG.TXT
+process_data.py
+view_morphology.py
+evolution.py

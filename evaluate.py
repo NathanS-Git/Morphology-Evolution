@@ -1,22 +1,20 @@
 import numpy as np
-import mujoco_py
 import torch
-import time
 import os
 import glob
 import re
 
 import TD3
 import utils
-
 import environment
-from MorphologyGeneration import MorphologyGeneration as morphgen
 
-
-def eval_policy(policy, seed, morphology_file, eval_episodes=10):
+def eval_policy(policy, morphology_file, eval_episodes=10):
+    """
+    Evaluates the currently trained policy values and returns the average reward.
+    """
 
     eval_env = environment.make(morphology_file)
-    eval_env.seed(seed + 100)
+    eval_env.seed(100)
 
     avg_reward = 0.
     for _ in range(eval_episodes):
@@ -28,21 +26,23 @@ def eval_policy(policy, seed, morphology_file, eval_episodes=10):
 
     avg_reward /= eval_episodes
 
-    print("---------------------------------------")
-    print(f"Evaluation over {eval_episodes} episodes: {avg_reward:.3f}")
-    print("---------------------------------------")
+    #print(f"Evaluation over {eval_episodes} episodes: {avg_reward:.3f}")
     return avg_reward
 
 
 def eval_morphology(morphology_file,episode_count=1e7):
+    """
+    Trains a morphology given its xml file location and return
+    its highest fitness achieved after training.
+    """
 
     file_name = morphology_file
     
     morphology_name = re.search('[^/.]*(?=.xml)', file_name).group(0)
 
-    print("---------------------------------------")
+    print("--------------------------------------------------------------")
     print(f"Policy: TD3, Env: {morphology_name}, Seed: 0")
-    print("---------------------------------------")
+    print("--------------------------------------------------------------")
 
     if not os.path.exists("./results"):
         os.makedirs("./results")
@@ -90,7 +90,8 @@ def eval_morphology(morphology_file,episode_count=1e7):
         evaluations = list(np.append(previous_data,evaluations))
     except FileNotFoundError:
         # Evaluate untrained policy
-        evaluations = [eval_policy(policy, 0, morphology_file)]
+        evaluations = [eval_policy(policy, morphology_file)]
+        assert os.path.exists(f"./results/{morphology_name}.npy"), "Could not load model, but previous data existed."
 
     replay_buffer = utils.ReplayBuffer(state_dim, action_dim)
 
@@ -109,9 +110,8 @@ def eval_morphology(morphology_file,episode_count=1e7):
         if t < 25e3:
             action = env.action_space.sample()
         else:
-            action = (
-                policy.select_action(np.array(state))
-                + np.random.normal(0, max_action * 0.1, size=action_dim)).clip(-max_action, max_action)
+            action = (policy.select_action(np.array(state))
+                    + np.random.normal(0, max_action * 0.1, size=action_dim)).clip(-max_action, max_action)
 
         # Perform action
         next_state, reward, done, _ = env.step(action) 
@@ -127,9 +127,10 @@ def eval_morphology(morphology_file,episode_count=1e7):
         if t >= 25e3:
             policy.train(replay_buffer, 256)
 
-        if done: 
-            # +1 to account for 0 indexing. +0 on ep_timesteps since it will increment +1 even if done=True
-            print(f"Total T: {t+1} Episode Num: {episode_num+1} Episode T: {episode_timesteps} Reward: {episode_reward:.3f}")
+        if done:
+            if (episode_num+1) % 10 == 0:
+                # +1 to account for 0 indexing. +0 on ep_timesteps since it will increment +1 even if done=True
+                print(f"Total T: {t+1} Episode Num: {episode_num+1} Episode T: {episode_timesteps} Reward: {episode_reward:.3f}")
             # Reset environment
             state, done = env.reset(), False
             episode_reward = 0
@@ -138,7 +139,7 @@ def eval_morphology(morphology_file,episode_count=1e7):
 
         # Evaluate episode
         if (t + 1) % 5e3 == 0:
-            evaluations.append(eval_policy(policy, 0, morphology_file))
+            evaluations.append(eval_policy(policy, morphology_file))
             np.save(f"./results/{morphology_name}", evaluations)
             policy.save(f"./models/{morphology_name}")
 
@@ -150,6 +151,6 @@ if (__name__ == "__main__"):
     xml_files.sort()
 
     file_name = xml_files[-1] # By default, use the latest morphology
-    file_name = "./morphology/Morphology_2022-Mar-26 21:24:21 Gen:0 9.xml"
+    file_name = "./morphology/Morphology_2022-Mar-28 10:58:09 Gen:2 0.xml"
 
     eval_morphology(file_name)

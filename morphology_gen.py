@@ -4,8 +4,7 @@ import xml.etree.ElementTree as et
 import time
 import os
 
-
-def MorphologyGeneration(morphology,gen=0):
+def GenXML(morphology,gen=0):
 
     # GENERATE MORPHOLOGY XML FILE USING GIVEN CONFIGURATION
 
@@ -84,14 +83,14 @@ def MorphologyGeneration(morphology,gen=0):
             seg = et.SubElement(seg, "body", pos=" ".join(str(pos) for pos in last_pos)) # Recursive definition
             # Joint type
             if segment['joint_type'] == "hinge":
-                id = segment['name']
+                id = str(int(time.time()*10000000))
                 et.SubElement(actuators, "motor", joint=id, gear="100")
                 if segment['restricted'] == False:
                     et.SubElement(seg, "joint", name=id, limited=str(segment['restricted']).lower(), axis=' '.join(str(pos) for pos in segment['rotation_axis']), type=segment['joint_type'])
                 else:
                     et.SubElement(seg, "joint", name=id, limited=str(segment['restricted']).lower(), axis=' '.join(str(pos) for pos in segment['rotation_axis']), range=' '.join([str(pos) for pos in segment['joint_range']]), type=segment['joint_type'])
             elif segment['joint_type'] == "ball":
-                id = segment['name']
+                id = str(int(time.time()*10000000))
                 et.SubElement(actuators, "motor", joint=id, gear="100")
                 if segment['restricted'] == False:
                     et.SubElement(seg, "joint", name=id, limited=str(segment['restricted']).lower(), type=segment['joint_type'])
@@ -107,11 +106,11 @@ def MorphologyGeneration(morphology,gen=0):
     et.indent(tree) # Beautify the file
 
     extension = 0
-    name = "Morphology_"+time.strftime("%Y-%b-%d %H:%M:%S", time.localtime())+" Gen:"+str(gen)+" "+str(extension)
-    while os.path.exists(f"./morphology/{name}.xml"): 
-        extension += 1 # If you're creating many, append a value to the end
-        name = "Morphology_"+time.strftime("%Y-%b-%d %H:%M:%S", time.localtime())+" Gen:"+str(gen)+" "+str(extension)
-    
+    name = f"{main_body['custom_name']} Gen:{gen} {extension}"
+    while os.path.exists(f"./morphology/{name}.xml"):
+        extension += 1
+        name = f"{main_body['custom_name']} Gen:{gen} {extension}"
+
     if not os.path.exists("./morphology"):
         os.makedirs("./morphology")
     

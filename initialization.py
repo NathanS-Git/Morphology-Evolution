@@ -1,8 +1,9 @@
 import numpy as np
+import time
 
-from MorphologyGeneration import MorphologyGeneration as morphgen
+from morphology_gen import GenXML as morphgen
 
-def pop_init(pop_size=5, limb_low=1, limb_high=7, body_types=["sphere","capsule"], joint_low=1, joint_high=5):
+def pop_init(pop_size=10, limb_low=1, limb_high=6, body_types=["capsule","sphere"], joint_low=1, joint_high=5):
     ''' Population initialization
     Initializes the starting morphology types. '''
 
@@ -26,13 +27,16 @@ def pop_init(pop_size=5, limb_low=1, limb_high=7, body_types=["sphere","capsule"
         morphology = []
         main_body = {}
 
+        # Assign name to all morphology for this specific simulation
+        main_body['custom_name'] = time.strftime("%Y-%b-%d %H:%M:%S", time.localtime())
+
         # Choose main body type
         main_body['type'] = np.random.choice(body_types)
         if main_body['type'] == "sphere":
             main_body['size'] = min(np.abs(np.random.normal(0.25,0.1)),1)
         else: # Capsule
             main_body['size'] = diameter
-            main_body['length'] = np.random.random()
+            main_body['length'] = min(np.abs(np.random.normal(0.75,0.1)),1)
 
         morphology.append(main_body)
 
@@ -40,57 +44,33 @@ def pop_init(pop_size=5, limb_low=1, limb_high=7, body_types=["sphere","capsule"
             limb_seg = np.random.randint(joint_low,joint_high)
             limb = []
             if main_body['type'] == "sphere":
-                # Find a random point on the sphere to initialize a limb at
-                starting_x = np.random.normal()
-                starting_y = np.random.normal()
-                starting_z = np.random.normal()
-                denominator = 1/np.sqrt(np.square(starting_x)+np.square(starting_y)+np.square(starting_z))
-                starting_x *= denominator*main_body['size']*0.99
-                starting_y *= denominator*main_body['size']*0.99
-                starting_z *= denominator*main_body['size']*0.99
-                
-                # Add a fixed limb to connect to the outside of the sphere for visual purposes
-                seg = {}
-                starting_x *= 1.05
-                starting_y *= 1.05
-                starting_z *= 1.05
-                
-                seg['pos'] = (0,0,0)
-                seg['from_to'] = (0,0,0,starting_x,starting_y,starting_z)
-                seg['joint_type'] = "fixed"
-                seg['size'] = diameter
-
-                limb.append(seg)
-
+                radius = main_body['size']
             else: # Capsule
-                starting_x = np.random.uniform(-main_body['length']/2,main_body['length']/2)
-                starting_y = 0
-                starting_z = 0
+                radius = main_body['length']/2
+
+            # Find a random point on a sphere surrounding the main body to initialize a limb at
+            starting_x = np.random.normal()
+            starting_y = np.random.normal()
+            starting_z = np.random.normal()
+            denominator = 1/np.sqrt(np.square(starting_x)+np.square(starting_y)+np.square(starting_z))
+            starting_x *= denominator*radius*1.05
+            starting_y *= denominator*radius*1.05
+            starting_z *= denominator*radius*1.05
             
-            limb_seg_x = 0
-            limb_seg_y = 0
-            
-            for _ in range(limb_seg):
+            for limb_seg_i in range(limb_seg):
+                
                 seg = {}
                 
-                # Size & Initial starting position
-                seg['size'] = diameter
-                seg['pos'] = (starting_x+limb_seg_x, limb_seg_y+starting_y, starting_z)
-                
-                starting_x = 0
-                starting_y = 0
-                starting_z = 0
+                if limb_seg_i == 0:
+                    # Initial joint position defines where whole leg will appear relative to morphology body
+                    seg['initial_pos'] = (starting_x, starting_y, starting_z)
 
-                # Length
-                limb_seg_x = np.random.uniform(-0.5,0.5)
-                limb_seg_y = np.random.uniform(-0.5,0.5)
-                seg['from_to'] = (0,0,0,limb_seg_x, limb_seg_y, 0)
+                # Size & Length
+                seg['size'] = diameter
+                seg['length'] = np.random.random()*0.5
 
                 # Joint type
                 seg['joint_type'] = np.random.choice(["ball", "hinge"])
-
-                # Identifier
-                seg['name'] = str(int(time.time()*1000000))
 
                 # Rotation plane/axis
                 if seg['joint_type'] != "ball":

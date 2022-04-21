@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 
+# Source: https://github.com/sfujim/TD3/blob/master/utils.py
 
 class ReplayBuffer(object):
 	def __init__(self, state_dim, action_dim, max_size=int(1e6)):

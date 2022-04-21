@@ -1,5 +1,4 @@
 import os
-import gym
 import copy
 from gym import utils
 from gym.envs.mujoco import mujoco_env
@@ -58,5 +57,3 @@ class Env(AntEnv):
         pwd = os.getcwd()
 
         mujoco_env.MujocoEnv.__init__(self, pwd+'/'+xml_file, 5)
-
-    

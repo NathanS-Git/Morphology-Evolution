@@ -4,11 +4,13 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+# Source: https://github.com/sfujim/TD3/blob/master/TD3.py
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Implementation of Twin Delayed Deep Deterministic Policy Gradients (TD3)
 # Paper: https://arxiv.org/abs/1802.09477
+
 
 
 class Actor(nn.Module):
