@@ -91,7 +91,6 @@ def eval_morphology(morphology_file,episode_count=1e7):
     except FileNotFoundError:
         # Evaluate untrained policy
         evaluations = [eval_policy(policy, morphology_file)]
-        assert os.path.exists(f"./results/{morphology_name}.npy"), "Could not load model, but previous data existed."
 
     replay_buffer = utils.ReplayBuffer(state_dim, action_dim)
 
