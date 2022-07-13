@@ -9,9 +9,7 @@ import utils
 import environment
 
 def eval_policy(policy, morphology_file, eval_episodes=10):
-    """
-    Evaluates the currently trained policy values and returns the average reward.
-    """
+    """ Evaluates the currently trained policy values and returns the average reward. """
 
     eval_env = environment.make(morphology_file)
     eval_env.seed(100)
@@ -31,10 +29,8 @@ def eval_policy(policy, morphology_file, eval_episodes=10):
 
 
 def eval_morphology(morphology_file,episode_count=1e7):
-    """
-    Trains a morphology given its xml file location and return
-    its highest fitness achieved after training.
-    """
+    """ Trains a morphology given its xml file location and return
+    its highest fitness achieved after training. """
 
     file_name = morphology_file
     

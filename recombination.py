@@ -3,9 +3,10 @@ import numpy as np
 
 
 def breed(parent1, parent2):
-    ''' Merge two morphology into two unique children 
+    """ Merge two morphology into two unique children 
     Randomly swap the legs of the two parents to create two opposing children.
-    '''
+    """
+    
     parent1_clone = copy.deepcopy(parent1)
     parent2_clone = copy.deepcopy(parent2)
 

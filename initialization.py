@@ -1,11 +1,11 @@
 import numpy as np
 import time
 
-from morphology_gen import GenXML as morphgen
+import morphology_gen
 
 def pop_init(pop_size=10, limb_low=1, limb_high=6, body_types=["capsule","sphere"], joint_low=1, joint_high=5):
-    ''' Population initialization
-    Initializes the starting morphology types. '''
+    """ Population initialization
+    Initializes the starting morphology types. """
 
     population = []
 
@@ -89,7 +89,7 @@ def pop_init(pop_size=10, limb_low=1, limb_high=6, body_types=["capsule","sphere
                 limb.append(seg)
             morphology.append(limb)
         
-        morphology_file = morphgen(morphology)
+        morphology_file = morphology_gen.gen_XML(morphology)
         
         population.append((morphology_file,morphology))
 

@@ -1,10 +1,9 @@
 import numpy as np
-import mujoco_py
 import xml.etree.ElementTree as et
 import time
 import os
 
-def GenXML(morphology,gen=0):
+def gen_XML(morphology, generation=0):
 
     # GENERATE MORPHOLOGY XML FILE USING GIVEN CONFIGURATION
 
@@ -106,10 +105,10 @@ def GenXML(morphology,gen=0):
     et.indent(tree) # Beautify the file
 
     extension = 0
-    name = f"{main_body['custom_name']} Gen:{gen} {extension}"
+    name = f"{main_body['custom_name']} Gen:{generation} {extension}"
     while os.path.exists(f"./morphology/{name}.xml"):
         extension += 1
-        name = f"{main_body['custom_name']} Gen:{gen} {extension}"
+        name = f"{main_body['custom_name']} Gen:{generation} {extension}"
 
     if not os.path.exists("./morphology"):
         os.makedirs("./morphology")
@@ -117,7 +116,3 @@ def GenXML(morphology,gen=0):
     tree.write(f"./morphology/{name}.xml")
     
     return f"./morphology/{name}.xml"
-
-
-if (__name__ == "__main__"):
-    pass

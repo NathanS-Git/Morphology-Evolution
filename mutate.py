@@ -1,13 +1,13 @@
 import numpy as np
 
 
-def micro_mutation(morphology,body_p=0.1,joint_range_p=0.75,joint_plane_p=0.75,len_change_p=0.75):
-    ''' Micro mutations:
+def micro_mutation(morphology, body_p=0.1, joint_range_p=0.75, joint_plane_p=0.75, len_change_p=0.75):
+    """ Micro mutations:
     DOF of joints
     Joint hinge plane
     Minor length changes
     Main body size adjustment
-    '''
+    """
 
     if np.random.random() < body_p:
         # Main body size adjustment
@@ -39,24 +39,22 @@ def micro_mutation(morphology,body_p=0.1,joint_range_p=0.75,joint_plane_p=0.75,l
                 seg['length'] *= min(np.abs(np.random.normal(0.75,0.1)),1)
 
 
-def macro_mutation(morphology,len_change_p=0.3,joint_change_p=0.1,seg_rem_p=0.01,seg_add_p=0.01,leg_rem_p=0.1,leg_add_p=0.1,joint_low=1,joint_high=5):
-    ''' Macro mutations:
+def macro_mutation(morphology, len_change_p=0.3, joint_change_p=0.1, seg_rem_p=0.01, seg_add_p=0.01, leg_rem_p=0.1, leg_add_p=0.1, joint_low=1, joint_high=5):
+    """ Macro mutations:
     Joint type change # Evaluated per segment
     Remove/add entire leg segments # Evaluated per leg
     Remove/add entire leg's # Evaluated once per morphology
     Major length changes # Evaluated per segment
-    '''
+    """
+
     diameter = 0.08
 
     if np.random.random() < leg_rem_p and len(morphology[1:]) > 1: # Remove random leg
-        
         index = np.random.randint(len(morphology)-1)
         # Never remove main body (it's important)
         del morphology[index+1]
     
-
     if np.random.random() < leg_add_p: # Add leg
-        
         limb_seg = np.random.randint(joint_low,joint_high)
         limb = []
 
@@ -75,9 +73,8 @@ def macro_mutation(morphology,len_change_p=0.3,joint_change_p=0.1,seg_rem_p=0.01
         starting_z *= denominator*radius*1.05
         
         for limb_seg_i in range(limb_seg):
-            
             seg = {}
-            
+
             if limb_seg_i == 0:
                 # Initial joint position, defines where whole leg will appear relative to morphology body
                 seg['initial_pos'] = (starting_x, starting_y, starting_z)
@@ -141,7 +138,6 @@ def macro_mutation(morphology,len_change_p=0.3,joint_change_p=0.1,seg_rem_p=0.01
             leg.append(seg)
 
         for seg in leg:
-
             # Major length change
             if np.random.random() < len_change_p:
                 seg['length'] *= np.abs(np.random.normal(0.75,0.15))

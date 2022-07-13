@@ -1,5 +1,4 @@
 import os
-import copy
 from gym import utils
 from gym.envs.mujoco import mujoco_env
 from gym.envs.mujoco.ant_v3 import AntEnv
@@ -8,7 +7,7 @@ from gym.wrappers.time_limit import TimeLimit
 
 
 def make(morphology_name):
-    """Instantiates an instance of the environment"""
+    """Instantiates an instance of the environment."""
 
     env = Env(morphology_name)
     env = OrderEnforcing(env)
@@ -20,7 +19,7 @@ def make(morphology_name):
 class Env(AntEnv):
     """ Wrapper for a modified OpenAI Gym to run with custom morphology.
     This also allows us to easily replace this with a unique implementation not relying on
-    OpenAI Gym.  """
+    OpenAI Gym. """
 
     def __init__(
         self,
