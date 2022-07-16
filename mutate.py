@@ -49,12 +49,14 @@ def macro_mutation(morphology, len_change_p=0.3, joint_change_p=0.1, seg_rem_p=0
 
     diameter = 0.08
 
-    if np.random.random() < leg_rem_p and len(morphology[1:]) > 1: # Remove random leg
+    # Remove random leg
+    if np.random.random() < leg_rem_p and len(morphology[1:]) > 1: 
         index = np.random.randint(len(morphology)-1)
         # Never remove main body (it's important)
         del morphology[index+1]
     
-    if np.random.random() < leg_add_p: # Add leg
+    # Add leg
+    if np.random.random() < leg_add_p: 
         limb_seg = np.random.randint(joint_low,joint_high)
         limb = []
 
