@@ -70,7 +70,7 @@ def pop_init(pop_size=10, limb_low=1, limb_high=6, body_types=["capsule","sphere
                 seg['length'] = np.random.random()*0.5
 
                 # Joint type
-                seg['joint_type'] = np.random.choice(["ball", "hinge"])
+                seg['joint_type'] = np.random.choice(["hinge"]) # 
 
                 # Rotation plane/axis
                 if seg['joint_type'] != "ball":

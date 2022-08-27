@@ -41,10 +41,8 @@ if (__name__ == "__main__"):
 
         for file_path, morphology in pop:
             try:
-                #fitness.append(np.random.randint(-1000,1000))
                 #fitness.append(eval_morphology(file_path,gen*episode_increase_per_gen))
                 fitness.append(evaluate.eval_morphology(file_path,static_eps_eval))
-                #fitness.append(np.random.random())
             except Exception:
                 print("Bad morphology. Something went wrong.")
                 traceback.print_exc()
