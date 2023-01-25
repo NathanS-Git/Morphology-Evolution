@@ -4,7 +4,7 @@ This project utilizes MuJoCo through a slightly modified environment based on Op
 
 &nbsp;
 
-## Examples
+## Overview
 
 You can read the paper associated with the project [here](docs/paper.pdf), however, reading it won't be necessary as I'll provide the data here.
 
