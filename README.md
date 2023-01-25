@@ -1,4 +1,4 @@
-# Evolving an optimal morphology for walking
+# Evolving an Optimal Morphology for Walking
 
 This project utilizes MuJoCo through a slightly modified environment based on OpenAI's gym to train and evaluate different generated morphologies. The morphology are designed by a genetic algorithm, and evaluated with a reinforcement learning algorithm called TD3.
 
