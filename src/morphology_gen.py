@@ -106,13 +106,14 @@ def gen_XML(morphology, generation=0):
 
     extension = 0
     name = f"{main_body['custom_name']} Gen:{generation} {extension}"
-    while os.path.exists(f"./morphology/{name}.xml"):
+    while os.path.exists(fr"./morphology/{name}.xml"):
         extension += 1
         name = f"{main_body['custom_name']} Gen:{generation} {extension}"
 
     if not os.path.exists("./morphology"):
         os.makedirs("./morphology")
     
-    tree.write(f"./morphology/{name}.xml")
-    
+    with open(f"morphology/{name}.xml", "wb") as f:
+        tree.write(f)
+
     return f"./morphology/{name}.xml"

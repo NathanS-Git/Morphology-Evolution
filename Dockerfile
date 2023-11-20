@@ -14,4 +14,4 @@ RUN apt-get -y update && apt-get install --no-install-recommends -y libglew-dev 
 
 WORKDIR /app
 COPY . .
-CMD ["python", "src/main.py"]
+CMD ["python", "-u", "src/main.py"]

@@ -1,8 +1,10 @@
-from doctest import IGNORE_EXCEPTION_DETAIL
 import numpy as np
 import traceback
 import pickle
 import os
+import wandb
+import torch.multiprocessing as multiprocessing
+import asyncio
 
 import morphology_gen
 import evaluate
@@ -12,7 +14,8 @@ import selection
 import recombination
 
 
-if (__name__ == "__main__"):
+
+async def main():
 
     if os.path.exists("Backup.dat"):
         print("RECOVERING...")
@@ -24,12 +27,17 @@ if (__name__ == "__main__"):
         pop = initialization.pop_init()
         begin_gen = 1
 
-    micro_mutation_p = 1 # Micro mutation probability
-    macro_mutation_p = 1 # Macro mutation probability
-    replacements_per = 6 # Replacements per generation (Should be even)
-    gen_count = 100 # Number of generations to evolve to
+    multiprocessing.set_start_method("spawn")
+
+    micro_mutation_p = 0.99 # Micro mutation probability
+    macro_mutation_p = 0.99 # Macro mutation probability
+    replacements_per = 10 # Replacements per generation (Should be even)
+    gen_count = 1000 # Number of generations to evolve to
     episode_increase_per_gen = 5e4
-    static_eps_eval = 5e5
+    static_eps_eval = 5e6
+
+    print("Beginning")
+
     for gen in range(begin_gen,gen_count):
         
         fitness = []
@@ -39,18 +47,18 @@ if (__name__ == "__main__"):
         pickle.dump((gen,pop),file)
         file.close()
 
-        for file_path, morphology in pop:
+        with multiprocessing.Pool(2) as pool:
             try:
-                #fitness.append(eval_morphology(file_path,gen*episode_increase_per_gen))
-                fitness.append(evaluate.eval_morphology(file_path,static_eps_eval))
+                fitness = pool.starmap_async(evaluate.eval_morphology, [(file_path, static_eps_eval) for file_path, morphology in pop]).get(timeout=1000)
+                #fitness = [evaluate.eval_morphology(x[0], static_eps_eval) for x in pop]
             except Exception:
                 print("Bad morphology. Something went wrong.")
                 traceback.print_exc()
-                fitness.append(float('-inf'))
+                fitness = [float('-inf') for _ in range(len(pop))]
         
         parent1_i, parent2_i = selection.parent_selection(fitness)
         children = []
-        for _ in range(replacements_per//2): # Six children
+        for _ in range(replacements_per//2): 
             children += recombination.breed(pop[parent1_i][1], pop[parent2_i][1])
 
         for child in children:
@@ -68,3 +76,6 @@ if (__name__ == "__main__"):
 
         print(f"Next Gen Population : {[n for n,m in pop]}")
         print(f"Generation: {gen}\t Best fitness: {max(fitness):.2f}\t Avg fitness: {sum(fitness)/len(fitness):.2f}\t Worst fitness: {min(fitness):.2f}")  
+
+if (__name__ == "__main__"):
+    asyncio.run(main())
