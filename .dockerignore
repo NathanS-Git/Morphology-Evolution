@@ -1,0 +1,9 @@
+.git
+Paper/**
+Poster/**
+__pycache__/**
+models/*
+morphology/*
+results/*
+Backup.dat
+
