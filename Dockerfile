@@ -10,8 +10,10 @@ RUN pip install mujoco-py==2.1.2.14
 RUN pip install wandb torch gym==0.21.0
 RUN pip install "cython<3"
 
-RUN apt-get -y update && apt-get install --no-install-recommends -y libglew-dev libosmesa6-dev xvfb patchelf ffmpeg cmake libgl1-mesa-dev libglu1-mesa-dev && apt-get clean
+RUN echo deb http://deb.debian.org/debian/ sid main contrib non-free non-free-firmware >> /etc/apt/sources.list
+RUN apt-get -y update && apt-get install --no-install-recommends -y libglew-dev libosmesa6-dev xvfb patchelf ffmpeg cmake libgl1-mesa-dev libglu1-mesa-dev nvidia-driver && apt-get clean
 
 WORKDIR /app
 COPY . .
+RUN python -c "import mujoco_py" 
 CMD ["python", "-u", "src/main.py"]

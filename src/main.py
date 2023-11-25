@@ -4,7 +4,6 @@ import pickle
 import os
 import wandb
 import torch.multiprocessing as multiprocessing
-import asyncio
 
 import morphology_gen
 import evaluate
@@ -15,7 +14,7 @@ import recombination
 
 
 
-async def main():
+def main():
 
     if os.path.exists("Backup.dat"):
         print("RECOVERING...")
@@ -47,9 +46,9 @@ async def main():
         pickle.dump((gen,pop),file)
         file.close()
 
-        with multiprocessing.Pool(2) as pool:
+        with multiprocessing.Pool(6) as pool:
             try:
-                fitness = pool.starmap_async(evaluate.eval_morphology, [(file_path, static_eps_eval) for file_path, morphology in pop]).get(timeout=1000)
+                fitness = pool.starmap(evaluate.eval_morphology, [(file_path, static_eps_eval) for file_path, morphology in pop])
                 #fitness = [evaluate.eval_morphology(x[0], static_eps_eval) for x in pop]
             except Exception:
                 print("Bad morphology. Something went wrong.")
@@ -78,4 +77,4 @@ async def main():
         print(f"Generation: {gen}\t Best fitness: {max(fitness):.2f}\t Avg fitness: {sum(fitness)/len(fitness):.2f}\t Worst fitness: {min(fitness):.2f}")  
 
 if (__name__ == "__main__"):
-    asyncio.run(main())
+    main()
