@@ -15,6 +15,7 @@ import recombination
 
 
 def main():
+    wandb.login()
 
     if os.path.exists("Backup.dat"):
         print("RECOVERING...")
@@ -33,12 +34,12 @@ def main():
     replacements_per = 10 # Replacements per generation (Should be even)
     gen_count = 1000 # Number of generations to evolve to
     episode_increase_per_gen = 5e4
-    static_eps_eval = 5e6
+    static_eps_eval = 5e5
 
     print("Beginning")
 
     for gen in range(begin_gen,gen_count):
-        
+
         fitness = []
         
         # Save info to file after each generation for recovery purposes
@@ -48,7 +49,7 @@ def main():
 
         with multiprocessing.Pool(6) as pool:
             try:
-                fitness = pool.starmap(evaluate.eval_morphology, [(file_path, static_eps_eval) for file_path, morphology in pop])
+                fitness = pool.starmap(evaluate.eval_morphology, [(file_path, static_eps_eval, gen) for file_path, morphology in pop])
                 #fitness = [evaluate.eval_morphology(x[0], static_eps_eval) for x in pop]
             except Exception:
                 print("Bad morphology. Something went wrong.")
@@ -75,6 +76,7 @@ def main():
 
         print(f"Next Gen Population : {[n for n,m in pop]}")
         print(f"Generation: {gen}\t Best fitness: {max(fitness):.2f}\t Avg fitness: {sum(fitness)/len(fitness):.2f}\t Worst fitness: {min(fitness):.2f}")  
+    wandb.finish()
 
 if (__name__ == "__main__"):
     main()

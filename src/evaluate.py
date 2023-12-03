@@ -3,6 +3,7 @@ import torch
 import os
 import glob
 import re
+import wandb
 
 import TD3
 import utils
@@ -28,7 +29,7 @@ def eval_policy(policy, morphology_file, eval_episodes=10):
     return avg_reward
 
 
-def eval_morphology(morphology_file,episode_count=1e7):
+def eval_morphology(morphology_file,episode_count=1e7,gen=1):
     """ Trains a morphology given its xml file location and return
     its highest fitness achieved after training. """
 
@@ -97,6 +98,13 @@ def eval_morphology(morphology_file,episode_count=1e7):
     episode_timesteps = 0
     episode_num = 0
 
+    wandb.init(
+        project="Morphology Evolution",
+        name=morphology_file,
+        config=kwargs,
+        group="Evolutionary Optimization"
+    )
+
     for t in range(starting_episode,int(episode_count)):
 
         episode_timesteps += 1
@@ -134,7 +142,9 @@ def eval_morphology(morphology_file,episode_count=1e7):
 
         # Evaluate episode
         if (t + 1) % 5e3 == 0:
-            evaluations.append(eval_policy(policy, morphology_file))
+            eval = eval_policy(policy, morphology_file)
+            wandb.log({f"Generation {gen:02} (fitness per 5k episodes)": eval})
+            evaluations.append(eval)
             np.save(f"./results/{morphology_name}", evaluations)
             policy.save(f"./models/{morphology_name}")
 

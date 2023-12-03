@@ -16,4 +16,5 @@ RUN apt-get -y update && apt-get install --no-install-recommends -y libglew-dev 
 WORKDIR /app
 COPY . .
 RUN python -c "import mujoco_py" 
+#CMD ["/bin/bash"]
 CMD ["python", "-u", "src/main.py"]
