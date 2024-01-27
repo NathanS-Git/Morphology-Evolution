@@ -13,6 +13,9 @@ RUN pip install wandb torch gym==0.21.0
 RUN echo deb http://deb.debian.org/debian/ sid main contrib non-free non-free-firmware >> /etc/apt/sources.list
 RUN apt-get -y update && apt-get install --no-install-recommends -y libglew-dev libosmesa6-dev xvfb patchelf ffmpeg cmake libgl1-mesa-dev libglu1-mesa-dev && apt-get clean
 
+RUN apt-get update && apt-get install -y openssl
+ENV WANDB_RUN_GROUP=$(openssl rand -hex 16)
+
 WORKDIR /app
 COPY . .
 RUN python -c "import mujoco_py" 

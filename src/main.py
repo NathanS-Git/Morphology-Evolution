@@ -31,7 +31,7 @@ def main():
 
     micro_mutation_p = 0.99 # Micro mutation probability
     macro_mutation_p = 0.99 # Macro mutation probability
-    replacements_per = 10 # Replacements per generation (Should be even)
+    replacements_per = 6 # Replacements per generation (Should be even)
     gen_count = 1000 # Number of generations to evolve to
     episode_increase_per_gen = 5e4
     static_eps_eval = 5e5
@@ -47,7 +47,7 @@ def main():
         pickle.dump((gen,pop),file)
         file.close()
 
-        with multiprocessing.Pool(6) as pool:
+        with multiprocessing.Pool(10) as pool:
             try:
                 fitness = pool.starmap(evaluate.eval_morphology, [(file_path, static_eps_eval, gen) for file_path, morphology in pop])
                 #fitness = [evaluate.eval_morphology(x[0], static_eps_eval) for x in pop]

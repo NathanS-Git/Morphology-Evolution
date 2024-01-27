@@ -101,8 +101,7 @@ def eval_morphology(morphology_file,episode_count=1e7,gen=1):
     wandb.init(
         project="Morphology Evolution",
         name=morphology_file,
-        config=kwargs,
-        group="Evolutionary Optimization"
+        config=kwargs
     )
 
     for t in range(starting_episode,int(episode_count)):
