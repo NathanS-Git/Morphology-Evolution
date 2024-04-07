@@ -1,0 +1,13 @@
+https://gist.github.com/kouroshHakha/534c0ff3fa36432bd2c06e44512f4883
+
+$ python3
+import mujoco_py
+print('gpu' in str(mujoco_py.cymj).split('/')[-1])
+
+If 'False' run the following:
+$ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/nvidia-000
+$ sudo mkdir -p /usr/lib/nvidia-000
+$ python3
+import mujoco_py
+print('gpu' in str(mujoco_py.cymj).split('/')[-1])
+# True
