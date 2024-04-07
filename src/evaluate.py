@@ -147,6 +147,8 @@ def eval_morphology(morphology_file,episode_count=1e7,gen=1):
             np.save(f"./results/{morphology_name}", evaluations)
             policy.save(f"./models/{morphology_name}")
 
+    wandb.finish()
+
     return max(evaluations)
 
 

@@ -50,7 +50,7 @@ def main():
         with multiprocessing.Pool(10) as pool:
             try:
                 fitness = pool.starmap(evaluate.eval_morphology, [(file_path, static_eps_eval, gen) for file_path, morphology in pop])
-                #fitness = [evaluate.eval_morphology(x[0], static_eps_eval) for x in pop]
+                #fitness = [evaluate.eval_morphology(x[0], static_eps_eval, gen) for x in pop]
             except Exception:
                 print("Bad morphology. Something went wrong.")
                 traceback.print_exc()
