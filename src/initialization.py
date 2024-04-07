@@ -8,6 +8,7 @@ def pop_init(pop_size=10, limb_low=1, limb_high=6, body_types=["capsule","sphere
     Initializes the starting morphology types. """
 
     population = []
+    current_time = time.strftime("%Y-%b-%d %H:%M:%S", time.localtime())
 
     for _ in range(pop_size):
 
@@ -28,7 +29,7 @@ def pop_init(pop_size=10, limb_low=1, limb_high=6, body_types=["capsule","sphere
         main_body = {}
 
         # Assign name to all morphology for this specific simulation
-        main_body['custom_name'] = time.strftime("%Y-%b-%d %H:%M:%S", time.localtime())
+        main_body['custom_name'] = current_time
 
         # Choose main body type
         main_body['type'] = np.random.choice(body_types)
