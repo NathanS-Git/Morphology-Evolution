@@ -4,6 +4,7 @@ import os
 import glob
 import re
 import wandb
+from mujoco_py.builder import MujocoException
 
 import TD3
 import utils
@@ -116,7 +117,10 @@ def eval_morphology(morphology_file,episode_count=1e7,gen=1):
                     + np.random.normal(0, max_action * 0.1, size=action_dim)).clip(-max_action, max_action)
 
         # Perform action
-        next_state, reward, done, _ = env.step(action) 
+        try:
+            next_state, reward, done, _ = env.step(action) 
+        except MujocoException:
+            return float('-inf')
         done_bool = float(done) if episode_timesteps < env._max_episode_steps else 0
 
         # Store data in replay buffer
